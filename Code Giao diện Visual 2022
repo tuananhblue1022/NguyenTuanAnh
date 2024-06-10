@@ -1,0 +1,215 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.IO.Ports;
+using ZedGraph;
+
+namespace giaoDienDieuKhien
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            string[] Baudrate = { "1200", "2400", "4800", "9600", "115200" };
+            lisbaud.Items.AddRange(Baudrate);
+            Control.CheckForIllegalCrossThreadCalls = false;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            liscom.DataSource = SerialPort.GetPortNames();
+            lisbaud.Text = "9600";
+            GraphPane myPanne = zedGraphControl1.GraphPane;
+            myPanne.Title.Text = "Biểu thị nhiệt độ LM35";
+            myPanne.YAxis.Title.Text = "Giá trị";
+            myPanne.XAxis.Title.Text = "Thời gian";
+            RollingPointPairList list = new RollingPointPairList(500000);
+            LineItem line = myPanne.AddCurve("nhiệt độ", list, Color.Red, SymbolType.Circle);
+            myPanne.XAxis.Scale.Min = 0;
+            myPanne.XAxis.Scale.Max = 100;
+            myPanne.XAxis.Scale.MinorStep = 1;
+            myPanne.XAxis.Scale.MajorStep = 2;
+
+            myPanne.YAxis.Scale.Min = 0;
+            myPanne.YAxis.Scale.Max = 100;
+            myPanne.YAxis.Scale.MinorStep = 1;
+            myPanne.YAxis.Scale.MajorStep = 2;
+
+
+            zedGraphControl1.AxisChange();
+
+        }
+        int tong = 0;
+        private void draw(double line)
+        {
+            LineItem duongline = zedGraphControl1.GraphPane.CurveList[0] as LineItem;
+            if (duongline == null)
+            {
+                return;
+            }
+            IPointListEdit list = duongline.Points as IPointListEdit;
+            if (list == null)
+            {
+                return;
+            }
+            list.Add(tong, line);
+            zedGraphControl1.AxisChange();
+            zedGraphControl1.Invalidate();
+            tong += 2;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (!serCOM.IsOpen)
+            {
+                button1.Text = " NGẮT KẾT NỐI";
+                serCOM.PortName = liscom.Text;
+                serCOM.BaudRate = Convert.ToInt32(lisbaud.Text);
+                serCOM.Open();
+            }
+            else
+            {
+                button1.Text = " KẾT NỐI";
+                serCOM.Close();
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (button2.Text == "ON")
+            {
+                serCOM.Write("1");
+                button2.Text = "OFF";
+            }
+            else if (button2.Text == "OFF")
+            {
+                serCOM.Write("a");
+                button2.Text = "ON";
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (button3.Text == "ON")
+            {
+                serCOM.Write("2");
+                button3.Text = "OFF";
+            }
+            else if (button3.Text == "OFF")
+            {
+                serCOM.Write("b");
+                button3.Text = "ON";
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (button4.Text == "ON")
+            {
+                serCOM.Write("3");
+                button4.Text = "OFF";
+            }
+            else if (button4.Text == "OFF")
+            {
+                serCOM.Write("c");
+                button4.Text = "ON";
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (button5.Text == "ON")
+            {
+                serCOM.Write("4");
+                button5.Text = "OFF";
+            }
+            else if (button5.Text == "OFF")
+            {
+                serCOM.Write("d");
+                button5.Text = "ON";
+            }
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            if (button6.Text == "ON")
+            {
+                serCOM.Write("5");
+                button6.Text = "OFF";
+            }
+            else if (button6.Text == "OFF")
+            {
+                serCOM.Write("e");
+                button6.Text = "ON";
+            }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            if (button7.Text == "ON")
+            {
+                serCOM.Write("6");
+                button7.Text = "OFF";
+            }
+            else if (button7.Text == "OFF")
+            {
+                serCOM.Write("f");
+                button7.Text = "ON";
+            }
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (button8.Text == "ON")
+            {
+                serCOM.Write("7");
+                button8.Text = "OFF";
+            }
+            else if (button8.Text == "OFF")
+            {
+                serCOM.Write("g");
+                button8.Text = "ON";
+            }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            if (button9.Text == "ON")
+            {
+                serCOM.Write("8");
+                button9.Text = "OFF";
+            }
+            else if (button9.Text == "OFF")
+            {
+                serCOM.Write("h");
+                button9.Text = "ON";
+            }
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            string alldata = "";
+            alldata = serCOM.ReadLine();
+            alldata = alldata.Trim();
+            int len = alldata.Length;
+            if (len > 0)
+            {
+                txtnhietDo2.Text = alldata;
+                Invoke(new MethodInvoker(() => draw(Convert.ToDouble(alldata))));
+            }
+        }
+
+        private void zedGraphControl1_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
+
+}
